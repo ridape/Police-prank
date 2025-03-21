@@ -171,6 +171,22 @@
         .call-buttons .hangup-button:hover {
             background-color: #cc0000;
         }
+        /* Fullscreen-Specific Styles */
+        .phone-screen:fullscreen {
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0; /* Remove rounded corners */
+            overflow: hidden;
+        }
+        .phone-screen:fullscreen .status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%; /* Span the full width */
+            padding: 5px 10px; /* Maintain padding for content */
+            box-sizing: border-box; /* Ensure padding doesn't affect layout */
+        }
     </style>
     <!-- Include ResponsiveVoice.js -->
     <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
@@ -228,21 +244,18 @@
                 elem.msRequestFullscreen();
             }
         }
-
         let callActive = false;
         let callTime = 0;
         let callInterval;
         let childName = "";
         let parentRole = "";
         const timeoutIds = []; // Array to store all setTimeout IDs
-
         // Fix for Ringing Sound
         const ringingSound = document.getElementById("ringingSound");
         ringingSound.volume = 0.5; // Adjust volume to 50%
         ringingSound.onerror = () => {
             console.error("Error loading ringing sound.");
         };
-
         // Update Current Time in Status Bar
         function updateCurrentTime() {
             const now = new Date();
@@ -252,11 +265,9 @@
             const formattedHours = (hours % 12 || 12).toString().padStart(2, "0"); // Convert to 12-hour format
             document.getElementById("currentTime").innerText = `${formattedHours}:${minutes} ${ampm}`;
         }
-
         // Start Updating Time Every Second
         setInterval(updateCurrentTime, 1000);
         updateCurrentTime(); // Initial call to set the time immediately
-
         function setParentRole(role) {
             parentRole = role;
             childName = document.getElementById("childName").value.trim();
@@ -270,7 +281,6 @@
                 alert("Please enter the child's name and select the parent role.");
             }
         }
-
         function startCall() {
             if (!childName || !parentRole) {
                 alert("Please enter the child's name and select the parent role.");
@@ -282,14 +292,12 @@
             document.getElementById("callTimer").innerText = "00:00";
             document.getElementById("callBtn").style.display = "none";
             document.getElementById("hangupBtn").style.display = "inline-block";
-
             // Play realistic ringing sound
             if (ringingSound.paused) {
                 ringingSound.play().catch((error) => {
                     console.error("Failed to play ringing sound:", error);
                 });
             }
-
             // Simulate call connection after 5 seconds
             setTimeout(() => {
                 ringingSound.pause(); // Stop ringing sound
@@ -298,7 +306,6 @@
                 startTimer();
             }, 5000); // 5 seconds of ringing
         }
-
         function endCall() {
             callActive = false;
             clearInterval(callInterval);
@@ -308,21 +315,17 @@
             document.getElementById("callScreen").style.display = "none";
             document.getElementById("callBtn").style.display = "inline-block";
             document.getElementById("hangupBtn").style.display = "none";
-
             // Stop Text-to-Speech immediately
             responsiveVoice.cancel();
-
             // Clear all pending timeouts
             timeoutIds.forEach((id) => clearTimeout(id));
             timeoutIds.length = 0; // Clear the array
-
             // Ensure ringing sound stops immediately
             if (!ringingSound.paused) {
                 ringingSound.pause();
                 ringingSound.currentTime = 0; // Reset audio to start
             }
         }
-
         function startTimer() {
             callInterval = setInterval(() => {
                 if (!callActive) return;
@@ -333,7 +336,6 @@
                     (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
             }, 1000);
         }
-
         function speak(text, delay = 0) {
             const timeoutId = setTimeout(() => {
                 responsiveVoice.speak(text, "UK English Male", {
@@ -341,17 +343,14 @@
                     rate: 0.9,
                 });
             }, delay);
-
             // Store the timeout ID to clear it later if needed
             timeoutIds.push(timeoutId);
         }
-
         function calculateDelay(text) {
             // Calculate delay based on the number of words in the text
             const wordCount = text.split(/\s+/).length;
             return wordCount * 500; // 500ms per word
         }
-
         function startDialogue() {
             const messages = [
                 { text: "911, what’s your emergency?", type: "open" },
@@ -366,12 +365,10 @@
                 { text: "Okay, since you apologized, I’ll tell the officer to turn around.", type: "statement" },
                 { text: "If we get another call, we’re coming straight to your house. Got it? Goodbye.", type: "statement" }
             ];
-
             let cumulativeDelay = 1000; // Initial delay
             messages.forEach((message, index) => {
                 const messageDuration = calculateDelay(message.text); // Estimate duration of TTS
                 speak(message.text, cumulativeDelay);
-
                 if (index === 0) {
                     // Add an extra delay of 4 seconds (4000ms) after the first message
                     cumulativeDelay += messageDuration + 4000;
