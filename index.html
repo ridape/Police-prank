@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Prank Call - Police</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -18,13 +18,14 @@
         }
         /* Phone Screen Container */
         .phone-screen {
-            width: 100vw; /* Full viewport width */
-            height: 100vh; /* Full viewport height */
+            width: 90%; /* Responsive width */
+            max-width: 400px; /* Limit maximum width */
+            height: 80vh; /* Responsive height */
             background-color: #000;
-            border-radius: 0; /* Remove rounded corners */
+            border-radius: 40px;
             overflow: hidden;
             position: relative;
-            box-shadow: none; /* Remove shadow */
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
         }
@@ -46,6 +47,58 @@
         }
         .status-bar .icons span {
             font-size: 2.5vw; /* Responsive font size */
+        }
+        /* Input and Selection */
+        .input-section {
+            flex: 1; /* Take up remaining space in the container */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .input-section input {
+            padding: 10px;
+            font-size: 4vw; /* Responsive font size */
+            border-radius: 5px;
+            border: none;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            width: 80%;
+        }
+        .input-section input::placeholder {
+            color: #aaa;
+        }
+        .input-section .parent-buttons {
+            display: flex;
+            gap: 5vw; /* Responsive gap */
+        }
+        .input-section button {
+            padding: 10px 20px;
+            font-size: 4vw; /* Responsive font size */
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background-color: #333;
+            color: white;
+        }
+        .input-section button:hover {
+            background-color: #555;
+        }
+        /* Fullscreen Button */
+        .fullscreen-button {
+            padding: 10px 20px;
+            font-size: 3vw;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background-color: #ff4444;
+            color: white;
+        }
+        .fullscreen-button:hover {
+            background-color: #cc0000;
         }
         /* Call Screen */
         .call-screen {
@@ -112,45 +165,6 @@
         .call-buttons .hangup-button:hover {
             background-color: #cc0000;
         }
-        /* Input and Selection */
-        .input-section {
-            flex: 1; /* Take up remaining space in the container */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            padding: 20px;
-        }
-        .input-section input {
-            padding: 10px;
-            font-size: 4vw; /* Responsive font size */
-            border-radius: 5px;
-            border: none;
-            background-color: #333;
-            color: white;
-            text-align: center;
-            width: 80%;
-        }
-        .input-section input::placeholder {
-            color: #aaa;
-        }
-        .input-section .parent-buttons {
-            display: flex;
-            gap: 5vw; /* Responsive gap */
-        }
-        .input-section button {
-            padding: 10px 20px;
-            font-size: 4vw; /* Responsive font size */
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            background-color: #333;
-            color: white;
-        }
-        .input-section button:hover {
-            background-color: #555;
-        }
     </style>
     <!-- Include ResponsiveVoice.js -->
     <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
@@ -172,6 +186,8 @@
                 <button onclick="setParentRole('mother')">Mother</button>
                 <button onclick="setParentRole('father')">Father</button>
             </div>
+            <!-- Fullscreen Button -->
+            <button class="fullscreen-button" onclick="requestFullScreen()">Go Fullscreen</button>
         </div>
         <!-- Call Screen -->
         <div class="call-screen" id="callScreen">
@@ -206,11 +222,6 @@
                 elem.msRequestFullscreen();
             }
         }
-
-        // Call the full-screen function when the page loads
-        document.addEventListener("DOMContentLoaded", () => {
-            requestFullScreen();
-        });
 
         let callActive = false;
         let callTime = 0;
