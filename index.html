@@ -224,8 +224,6 @@
     </div>
     <!-- Audio for Realistic Ringing Sound -->
     <audio id="ringingSound" src="https://www.soundjay.com/phone/phone-calling-1b.mp3" loop></audio>
-    <!-- Audio for Click Sound -->
-    <audio id="clickSound" src="https://www.soundjay.com/phone/phone-pick-up-3.mp3"></audio>
     <script>
         // Fullscreen API Implementation
         function requestFullScreen() {
@@ -261,14 +259,9 @@
         const timeoutIds = []; // Array to store all setTimeout IDs
         // Fix for Ringing Sound
         const ringingSound = document.getElementById("ringingSound");
-        const clickSound = document.getElementById("clickSound");
         ringingSound.volume = 0.5; // Adjust volume to 50%
-        clickSound.volume = 0.8; // Adjust click sound volume
         ringingSound.onerror = () => {
             console.error("Error loading ringing sound.");
-        };
-        clickSound.onerror = () => {
-            console.error("Error loading click sound.");
         };
         // Update Current Time in Status Bar
         function updateCurrentTime() {
@@ -315,9 +308,6 @@
             // Simulate call connection after 5 seconds
             setTimeout(() => {
                 ringingSound.pause(); // Stop ringing sound
-                clickSound.play().catch((error) => {
-                    console.error("Failed to play click sound:", error);
-                }); // Play click sound
                 document.getElementById("callStatus").innerText = "Connected";
                 startDialogue();
                 startTimer();
@@ -371,7 +361,7 @@
         function startDialogue() {
             const messages = [
                 { text: "911, what’s your emergency?", type: "open" },
-                { text: "What's the name and age of the child?", type: "open" },
+                { text: "What's the name and age of the suspect?", type: "open" },
                 { text: `Are you the ${parentRole} of ${childName}?`, type: "yesno" },
                 { text: `Please give the phone to ${childName}.`, type: "statement" },
                 { text: `Hello, is this ${childName}?`, type: "yesno" },
@@ -399,6 +389,30 @@
                 }
             });
         }
+
+        // Screen Wake Lock Implementation
+        let wakeLock = null;
+
+        async function requestWakeLock() {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                console.log('Wake Lock is active');
+            } catch (err) {
+                console.error(`${err.name}, ${err.message}`);
+            }
+        }
+
+        // Listen for visibility change events to reacquire wake lock if necessary
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                await requestWakeLock();
+            }
+        });
+
+        // Request wake lock when the page loads
+        window.addEventListener('load', () => {
+            requestWakeLock();
+        });
     </script>
 </body>
 </html>
