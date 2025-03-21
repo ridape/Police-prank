@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Prank Call - Police</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            font-family: Arial, sans-serif;
+            color: white;
+            overflow: hidden; /* Prevent scrolling */
+        }
+        /* Phone Screen Container */
+        .phone-screen {
+            width: 90%; /* Responsive width */
+            max-width: 400px; /* Limit maximum width */
+            height: 80vh; /* Responsive height */
+            background-color: #000;
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        /* Status Bar (Top Bar) */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            font-size: 3vw; /* Responsive font size */
+        }
+        .status-bar .time {
+            font-weight: bold;
+        }
+        .status-bar .icons {
+            display: flex;
+            gap: 5px;
+        }
+        .status-bar .icons span {
+            font-size: 2.5vw; /* Responsive font size */
+        }
+        /* Call Screen */
+        .call-screen {
+            flex: 1; /* Take up remaining space in the container */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            display: none; /* Hidden by default */
+        }
+        .call-screen .contact-photo {
+            width: 20%; /* Responsive sizing */
+            aspect-ratio: 1; /* Maintain square aspect ratio */
+            border-radius: 50%;
+            background-color: #555;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+        .call-screen .contact-name {
+            font-size: 5vw; /* Responsive font size */
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .call-screen .call-status {
+            font-size: 3vw; /* Responsive font size */
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        .call-screen .call-timer {
+            font-size: 2.5vw; /* Responsive font size */
+            color: #888;
+            margin-bottom: 40px;
+        }
+        /* Call Buttons */
+        .call-buttons {
+            display: flex;
+            gap: 5vw; /* Responsive gap */
+        }
+        .call-buttons button {
+            width: 15vw; /* Responsive button size */
+            height: 15vw; /* Responsive button size */
+            border-radius: 50%;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 6vw; /* Responsive font size */
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+        .call-buttons button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .call-buttons .hangup-button {
+            background-color: #ff4444;
+        }
+        .call-buttons .hangup-button:hover {
+            background-color: #cc0000;
+        }
+        /* Input and Selection */
+        .input-section {
+            flex: 1; /* Take up remaining space in the container */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .input-section input {
+            padding: 10px;
+            font-size: 4vw; /* Responsive font size */
+            border-radius: 5px;
+            border: none;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            width: 80%;
+        }
+        .input-section input::placeholder {
+            color: #aaa;
+        }
+        .input-section .parent-buttons {
+            display: flex;
+            gap: 5vw; /* Responsive gap */
+        }
+        .input-section button {
+            padding: 10px 20px;
+            font-size: 4vw; /* Responsive font size */
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background-color: #333;
+            color: white;
+        }
+        .input-section button:hover {
+            background-color: #555;
+        }
+    </style>
+    <!-- Include ResponsiveVoice.js -->
+    <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
+</head>
+<body>
+    <div class="phone-screen">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="time" id="currentTime">9:41 AM</div>
+            <div class="icons">
+                <span>📶</span>
+                <span>🔋</span>
+            </div>
+        </div>
+        <!-- Input Section -->
+        <div class="input-section" id="inputSection">
+            <input type="text" id="childName" placeholder="Enter child's name">
+            <div class="parent-buttons">
+                <button onclick="setParentRole('mother')">Mother</button>
+                <button onclick="setParentRole('father')">Father</button>
+            </div>
+        </div>
+        <!-- Call Screen -->
+        <div class="call-screen" id="callScreen">
+            <!-- Contact Photo -->
+            <div class="contact-photo">👮‍♂️</div>
+            <!-- Contact Name -->
+            <div class="contact-name">Police Department</div>
+            <!-- Call Status -->
+            <div class="call-status" id="callStatus">Ready to call</div>
+            <!-- Call Timer -->
+            <div class="call-timer" id="callTimer">00:00</div>
+            <!-- Call Buttons -->
+            <div class="call-buttons">
+                <button onclick="startCall()" id="callBtn">📞</button>
+                <button class="hangup-button" onclick="endCall()" id="hangupBtn" style="display: none;">🔴</button>
+            </div>
+        </div>
+    </div>
+    <!-- Audio for Realistic Ringing Sound -->
+    <audio id="ringingSound" src="https://www.soundjay.com/phone/phone-calling-1b.mp3" loop></audio>
+    <script>
+        let callActive = false;
+        let callTime = 0;
+        let callInterval;
+        let childName = "";
+        let parentRole = "";
+        const timeoutIds = []; // Array to store all setTimeout IDs
+        // Fix for Ringing Sound
+        const ringingSound = document.getElementById("ringingSound");
+        ringingSound.volume = 0.5; // Adjust volume to 50%
+        ringingSound.onerror = () => {
+            console.error("Error loading ringing sound.");
+        };
+        // Update Current Time in Status Bar
+        function updateCurrentTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, "0");
+            const minutes = now.getMinutes().toString().padStart(2, "0");
+            const ampm = hours >= 12 ? "PM" : "AM";
+            const formattedHours = (hours % 12 || 12).toString().padStart(2, "0"); // Convert to 12-hour format
+            document.getElementById("currentTime").innerText = `${formattedHours}:${minutes} ${ampm}`;
+        }
+        // Start Updating Time Every Second
+        setInterval(updateCurrentTime, 1000);
+        updateCurrentTime(); // Initial call to set the time immediately
+        function setParentRole(role) {
+            parentRole = role;
+            childName = document.getElementById("childName").value.trim();
+            if (childName && parentRole) {
+                // Hide input section and show call screen
+                document.getElementById("inputSection").style.display = "none";
+                document.getElementById("callScreen").style.display = "flex";
+                document.getElementById("callStatus").innerText = "Ready to call";
+                document.getElementById("callBtn").style.display = "inline-block";
+            } else {
+                alert("Please enter the child's name and select the parent role.");
+            }
+        }
+        function startCall() {
+            if (!childName || !parentRole) {
+                alert("Please enter the child's name and select the parent role.");
+                return;
+            }
+            callActive = true;
+            callTime = 0;
+            document.getElementById("callStatus").innerText = "Calling Police...";
+            document.getElementById("callTimer").innerText = "00:00";
+            document.getElementById("callBtn").style.display = "none";
+            document.getElementById("hangupBtn").style.display = "inline-block";
+            // Play realistic ringing sound
+            if (ringingSound.paused) {
+                ringingSound.play().catch((error) => {
+                    console.error("Failed to play ringing sound:", error);
+                });
+            }
+            // Simulate call connection after 5 seconds
+            setTimeout(() => {
+                ringingSound.pause(); // Stop ringing sound
+                document.getElementById("callStatus").innerText = "Connected";
+                startDialogue();
+                startTimer();
+            }, 5000); // 5 seconds of ringing
+        }
+        function endCall() {
+            callActive = false;
+            clearInterval(callInterval);
+            document.getElementById("callStatus").innerText = "Call ended";
+            document.getElementById("callTimer").innerText = "";
+            document.getElementById("inputSection").style.display = "flex";
+            document.getElementById("callScreen").style.display = "none";
+            document.getElementById("callBtn").style.display = "inline-block";
+            document.getElementById("hangupBtn").style.display = "none";
+            // Stop Text-to-Speech immediately
+            responsiveVoice.cancel();
+            // Clear all pending timeouts
+            timeoutIds.forEach((id) => clearTimeout(id));
+            timeoutIds.length = 0; // Clear the array
+            // Ensure ringing sound stops immediately
+            if (!ringingSound.paused) {
+                ringingSound.pause();
+                ringingSound.currentTime = 0; // Reset audio to start
+            }
+        }
+        function startTimer() {
+            callInterval = setInterval(() => {
+                if (!callActive) return;
+                callTime++;
+                let minutes = Math.floor(callTime / 60);
+                let seconds = callTime % 60;
+                document.getElementById("callTimer").innerText =
+                    (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+            }, 1000);
+        }
+        function speak(text, delay = 0) {
+            const timeoutId = setTimeout(() => {
+                responsiveVoice.speak(text, "UK English Male", {
+                    pitch: 0.8,
+                    rate: 0.9,
+                });
+            }, delay);
+            // Store the timeout ID to clear it later if needed
+            timeoutIds.push(timeoutId);
+        }
+        function calculateDelay(text) {
+            // Calculate delay based on the number of words in the text
+            const wordCount = text.split(/\s+/).length;
+            return wordCount * 500; // 500ms per word
+        }
+        function startDialogue() {
+            const messages = [
+                { text: "911, what’s your emergency?", type: "open" },
+                { text: "What's the name and age of the suspect?", type: "open" },
+                { text: `Are you the ${parentRole} of ${childName}?`, type: "yesno" },
+                { text: `Please give the phone to ${childName}.`, type: "statement" },
+                { text: `Hello, is this ${childName}?`, type: "yesno" },
+                { text: "This is the police. We heard you’re causing some problems. Is that true?", type: "yesno" },
+                { text: "Listen, this is serious. You need to stop what you’re doing right now.", type: "statement" },
+                { text: "I’m sending an officer over to your house to talk to you. They’ll be there soon.", type: "statement" },
+                { text: "If you say you’re sorry, I can call off the officer. Go ahead, say you're sorry.", type: "open" },
+                { text: "Okay, since you apologized, I’ll tell the officer to turn around.", type: "statement" },
+                { text: "If we get another call, we’re coming straight to your house. Got it? Goodbye.", type: "statement" }
+            ];
+
+            let cumulativeDelay = 1000; // Initial delay
+
+            messages.forEach((message, index) => {
+                const messageDuration = calculateDelay(message.text); // Estimate duration of TTS
+                speak(message.text, cumulativeDelay);
+
+                if (index === 0) {
+                    // Add an extra delay of 4 seconds (4000ms) after the first message
+                    cumulativeDelay += messageDuration + 4000;
+                } else if (message.type === "open") {
+                    cumulativeDelay += messageDuration + 3000; // Add estimated duration + 3-second pause for open-ended questions
+                } else if (message.type === "yesno") {
+                    cumulativeDelay += messageDuration + 2000; // Add estimated duration + 2-second pause for yes/no questions
+                } else {
+                    // No additional delay for statements
+                    cumulativeDelay += messageDuration;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
