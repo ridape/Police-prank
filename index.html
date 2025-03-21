@@ -34,9 +34,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
+            padding: 5px 10px; /* Reduced padding for tighter alignment */
             background-color: rgba(255, 255, 255, 0.1);
             font-size: 3vw; /* Responsive font size */
+            position: absolute; /* Lock it to the top */
+            top: 0; /* Align to the very top */
+            left: 0; /* Align to the very left */
+            right: 0; /* Stretch across the width */
+            height: 40px; /* Fixed height for consistency */
+            box-sizing: border-box; /* Ensure padding doesn't affect layout */
         }
         .status-bar .time {
             font-weight: bold;
@@ -56,7 +62,7 @@
             align-items: center;
             justify-content: center;
             gap: 20px;
-            padding: 20px;
+            padding: 60px 20px 20px; /* Add top padding to avoid overlap with status bar */
         }
         .input-section input {
             padding: 10px;
