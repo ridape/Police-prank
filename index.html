@@ -184,8 +184,6 @@
     </style>
     <!-- Include ResponsiveVoice.js -->
     <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
-    <!-- Include NoSleep.js -->
-    <script src="https://cdn.jsdelivr.net/npm/nosleep.js/dist/NoSleep.min.js"></script>
 </head>
 <body>
     <div class="phone-screen" id="phoneScreen">
@@ -227,9 +225,6 @@
     <!-- Audio for Realistic Ringing Sound -->
     <audio id="ringingSound" src="https://www.soundjay.com/phone/phone-calling-1b.mp3" loop></audio>
     <script>
-        // Initialize NoSleep
-        const noSleep = new NoSleep();
-
         // Fullscreen API Implementation
         function requestFullScreen() {
             const phoneScreen = document.getElementById("phoneScreen");
@@ -242,10 +237,10 @@
             } else if (phoneScreen.msRequestFullscreen) { // IE/Edge
                 phoneScreen.msRequestFullscreen();
             }
+
             // Add 'fullscreen-mode' class to phone screen
             phoneScreen.classList.add("fullscreen-mode");
-            // Enable NoSleep to keep the screen on
-            noSleep.enable();
+
             // Hide browser UI (address bar, etc.)
             setTimeout(() => {
                 window.scrollTo(0, 1); // Scroll slightly to hide address bar
@@ -257,8 +252,6 @@
             const phoneScreen = document.getElementById("phoneScreen");
             if (!document.fullscreenElement) {
                 phoneScreen.classList.remove("fullscreen-mode");
-                // Disable NoSleep when exiting fullscreen
-                noSleep.disable();
             }
         });
 
@@ -268,14 +261,12 @@
         let childName = "";
         let parentRole = "";
         const timeoutIds = []; // Array to store all setTimeout IDs
-
         // Fix for Ringing Sound
         const ringingSound = document.getElementById("ringingSound");
         ringingSound.volume = 0.5; // Adjust volume to 50%
         ringingSound.onerror = () => {
             console.error("Error loading ringing sound.");
         };
-
         // Update Current Time in Status Bar
         function updateCurrentTime() {
             const now = new Date();
@@ -285,11 +276,9 @@
             const formattedHours = (hours % 12 || 12).toString().padStart(2, "0"); // Convert to 12-hour format
             document.getElementById("currentTime").innerText = `${formattedHours}:${minutes} ${ampm}`;
         }
-
         // Start Updating Time Every Second
         setInterval(updateCurrentTime, 1000);
         updateCurrentTime(); // Initial call to set the time immediately
-
         function setParentRole(role) {
             parentRole = role;
             childName = document.getElementById("childName").value.trim();
@@ -303,7 +292,6 @@
                 alert("Please enter the child's name and select the parent role.");
             }
         }
-
         function startCall() {
             if (!childName || !parentRole) {
                 alert("Please enter the child's name and select the parent role.");
@@ -329,7 +317,6 @@
                 startTimer();
             }, 5000); // 5 seconds of ringing
         }
-
         function endCall() {
             callActive = false;
             clearInterval(callInterval);
@@ -349,10 +336,7 @@
                 ringingSound.pause();
                 ringingSound.currentTime = 0; // Reset audio to start
             }
-            // Disable NoSleep when ending the call
-            noSleep.disable();
         }
-
         function startTimer() {
             callInterval = setInterval(() => {
                 if (!callActive) return;
@@ -363,7 +347,6 @@
                     (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
             }, 1000);
         }
-
         function speak(text, delay = 0) {
             const timeoutId = setTimeout(() => {
                 responsiveVoice.speak(text, "UK English Male", {
@@ -374,13 +357,11 @@
             // Store the timeout ID to clear it later if needed
             timeoutIds.push(timeoutId);
         }
-
         function calculateDelay(text) {
             // Calculate delay based on the number of words in the text
             const wordCount = text.split(/\s+/).length;
             return wordCount * 500; // 500ms per word
         }
-
         function startDialogue() {
             const messages = [
                 { text: "911, what’s your emergency?", type: "open" },
