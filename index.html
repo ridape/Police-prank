@@ -399,6 +399,58 @@
                 }
             });
         }
+
+        // Simulate Screen Tap to Keep Screen On
+        function simulateTap() {
+            const phoneScreen = document.getElementById("phoneScreen");
+            const tapEvent = new Event("touchstart", {
+                bubbles: true,
+                cancelable: true,
+            });
+            phoneScreen.dispatchEvent(tapEvent);
+        }
+
+        // Start Simulating Taps Every 10 Seconds
+        let tapInterval;
+        function startSimulatedTaps() {
+            tapInterval = setInterval(simulateTap, 10000); // Simulate tap every 10 seconds
+        }
+
+        // Stop Simulating Taps
+        function stopSimulatedTaps() {
+            clearInterval(tapInterval);
+        }
+
+        // Start Simulated Taps When Fullscreen is Activated
+        function requestFullScreen() {
+            const phoneScreen = document.getElementById("phoneScreen");
+            if (phoneScreen.requestFullscreen) {
+                phoneScreen.requestFullscreen();
+            } else if (phoneScreen.mozRequestFullScreen) { // Firefox
+                phoneScreen.mozRequestFullScreen();
+            } else if (phoneScreen.webkitRequestFullscreen) { // Chrome, Safari, and Opera
+                phoneScreen.webkitRequestFullscreen();
+            } else if (phoneScreen.msRequestFullscreen) { // IE/Edge
+                phoneScreen.msRequestFullscreen();
+            }
+            // Add 'fullscreen-mode' class to phone screen
+            phoneScreen.classList.add("fullscreen-mode");
+            // Hide browser UI (address bar, etc.)
+            setTimeout(() => {
+                window.scrollTo(0, 1); // Scroll slightly to hide address bar
+            }, 0);
+            // Start simulating taps
+            startSimulatedTaps();
+        }
+
+        // Stop Simulated Taps When Exiting Fullscreen
+        document.addEventListener("fullscreenchange", () => {
+            const phoneScreen = document.getElementById("phoneScreen");
+            if (!document.fullscreenElement) {
+                phoneScreen.classList.remove("fullscreen-mode");
+                stopSimulatedTaps();
+            }
+        });
     </script>
 </body>
 </html>
