@@ -6,22 +6,7 @@
     <title>Prank Call - Police</title>
     <style>
         /* Existing styles remain unchanged */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #000;
-            font-family: Arial, sans-serif;
-            color: white;
-            overflow: hidden;
-            margin: 0;
-            padding: 0;
-        }
-        /* Remaining styles... */
     </style>
-    <!-- Include ResponsiveVoice.js -->
     <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
 </head>
 <body>
@@ -61,16 +46,23 @@
         // Simulate Screen Tap to Keep Screen On
         function simulateTap() {
             const phoneScreen = document.getElementById("phoneScreen");
-            const tapEvent = new Event("touchstart", {
-                bubbles: true,
-                cancelable: true,
-            });
-            phoneScreen.dispatchEvent(tapEvent);
+
+            // Dispatch touchstart event
+            const touchStartEvent = new Event("touchstart", { bubbles: true, cancelable: true });
+            phoneScreen.dispatchEvent(touchStartEvent);
+
+            // Dispatch touchend event
+            const touchEndEvent = new Event("touchend", { bubbles: true, cancelable: true });
+            phoneScreen.dispatchEvent(touchEndEvent);
+
+            // Dispatch click event
+            const clickEvent = new Event("click", { bubbles: true, cancelable: true });
+            phoneScreen.dispatchEvent(clickEvent);
         }
 
         let tapInterval;
         function startSimulatedTaps() {
-            tapInterval = setInterval(simulateTap, 5000); // Simulate tap every 5 seconds
+            tapInterval = setInterval(simulateTap, 3000); // Simulate tap every 3 seconds
         }
 
         function stopSimulatedTaps() {
