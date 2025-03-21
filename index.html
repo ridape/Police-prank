@@ -15,8 +15,6 @@
             font-family: Arial, sans-serif;
             color: white;
             overflow: hidden; /* Prevent scrolling */
-            margin: 0; /* Ensure no default margin */
-            padding: 0; /* Ensure no default padding */
         }
         /* Phone Screen Container */
         .phone-screen {
@@ -195,6 +193,25 @@
     <!-- Audio for Realistic Ringing Sound -->
     <audio id="ringingSound" src="https://www.soundjay.com/phone/phone-calling-1b.mp3" loop></audio>
     <script>
+        // Fullscreen API Implementation
+        function requestFullScreen() {
+            const elem = document.documentElement; // Target the entire document
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) { // Firefox
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) { // Chrome, Safari, and Opera
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { // IE/Edge
+                elem.msRequestFullscreen();
+            }
+        }
+
+        // Call the full-screen function when the page loads
+        document.addEventListener("DOMContentLoaded", () => {
+            requestFullScreen();
+        });
+
         let callActive = false;
         let callTime = 0;
         let callInterval;
