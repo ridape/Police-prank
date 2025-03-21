@@ -181,21 +181,6 @@
         .call-buttons .hangup-button:hover {
             background-color: #cc0000;
         }
-        /* Video Player */
-        .video-container {
-            display: none; /* Hidden by default */
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10; /* Ensure it's above other elements */
-        }
-        .video-container video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Ensure the video covers the entire screen */
-        }
     </style>
     <!-- Include ResponsiveVoice.js -->
     <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
@@ -236,13 +221,11 @@
                 <button class="hangup-button" onclick="endCall()" id="hangupBtn" style="display: none;">🔴</button>
             </div>
         </div>
-        <!-- Video Container -->
-        <div class="video-container" id="videoContainer">
-            <video id="videoPlayer" src="https://www.w3schools.com/html/mov_bbb.mp4" loop muted></video>
-        </div>
     </div>
     <!-- Audio for Realistic Ringing Sound -->
     <audio id="ringingSound" src="https://www.soundjay.com/phone/phone-calling-1b.mp3" loop></audio>
+    <!-- Audio for Click Sound -->
+    <audio id="clickSound" src="https://www.soundjay.com/phone/phone-pick-up-3.mp3"></audio>
     <script>
         // Fullscreen API Implementation
         function requestFullScreen() {
@@ -278,9 +261,14 @@
         const timeoutIds = []; // Array to store all setTimeout IDs
         // Fix for Ringing Sound
         const ringingSound = document.getElementById("ringingSound");
+        const clickSound = document.getElementById("clickSound");
         ringingSound.volume = 0.5; // Adjust volume to 50%
+        clickSound.volume = 0.8; // Adjust click sound volume
         ringingSound.onerror = () => {
             console.error("Error loading ringing sound.");
+        };
+        clickSound.onerror = () => {
+            console.error("Error loading click sound.");
         };
         // Update Current Time in Status Bar
         function updateCurrentTime() {
@@ -327,17 +315,12 @@
             // Simulate call connection after 5 seconds
             setTimeout(() => {
                 ringingSound.pause(); // Stop ringing sound
+                clickSound.play().catch((error) => {
+                    console.error("Failed to play click sound:", error);
+                }); // Play click sound
                 document.getElementById("callStatus").innerText = "Connected";
                 startDialogue();
                 startTimer();
-
-                // Show and play the video
-                const videoContainer = document.getElementById("videoContainer");
-                const videoPlayer = document.getElementById("videoPlayer");
-                videoContainer.style.display = "block"; // Show the video container
-                videoPlayer.play().catch((error) => {
-                    console.error("Failed to play video:", error);
-                });
             }, 5000); // 5 seconds of ringing
         }
         function endCall() {
@@ -349,25 +332,16 @@
             document.getElementById("callScreen").style.display = "none";
             document.getElementById("callBtn").style.display = "inline-block";
             document.getElementById("hangupBtn").style.display = "none";
-
             // Stop Text-to-Speech immediately
             responsiveVoice.cancel();
             // Clear all pending timeouts
             timeoutIds.forEach((id) => clearTimeout(id));
-            timeoutIds.length = 0;
-
+            timeoutIds.length = 0; // Clear the array
             // Ensure ringing sound stops immediately
             if (!ringingSound.paused) {
                 ringingSound.pause();
                 ringingSound.currentTime = 0; // Reset audio to start
             }
-
-            // Stop and hide the video
-            const videoContainer = document.getElementById("videoContainer");
-            const videoPlayer = document.getElementById("videoPlayer");
-            videoPlayer.pause();
-            videoPlayer.currentTime = 0;
-            videoContainer.style.display = "none"; // Hide the video container
         }
         function startTimer() {
             callInterval = setInterval(() => {
