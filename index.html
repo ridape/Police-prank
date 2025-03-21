@@ -15,6 +15,7 @@
             font-family: Arial, sans-serif;
             color: white;
             overflow: hidden; /* Prevent scrolling */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
             margin: 0; /* Ensure no margin */
             padding: 0; /* Ensure no padding */
         }
@@ -203,7 +204,7 @@
                 <button onclick="setParentRole('father')">Father</button>
             </div>
             <!-- Fullscreen Button -->
-            <button class="fullscreen-button" onclick="requestFullScreen()">Go Fullscreen in Chrome</button>
+            <button class="fullscreen-button" onclick="requestFullScreen()">Go Fullscreen</button>
         </div>
         <!-- Call Screen -->
         <div class="call-screen" id="callScreen">
@@ -227,7 +228,7 @@
     <!-- Audio for Click Sound -->
     <audio id="clickSound" src="https://www.soundjay.com/phone/phone-pick-up-3.mp3"></audio>
     <script>
-        // Fullscreen API Implementation
+        // Fullscreen API Implementation (Safari Compatible)
         function requestFullScreen() {
             const phoneScreen = document.getElementById("phoneScreen");
             if (phoneScreen.requestFullscreen) {
@@ -245,20 +246,35 @@
             setTimeout(() => {
                 window.scrollTo(0, 1); // Scroll slightly to hide address bar
             }, 0);
+
+            // Start simulating taps
+            startSimulatedTaps();
         }
-        // Exit Fullscreen
+
+        // Exit Fullscreen (Safari Compatible)
         document.addEventListener("fullscreenchange", () => {
             const phoneScreen = document.getElementById("phoneScreen");
-            if (!document.fullscreenElement) {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 phoneScreen.classList.remove("fullscreen-mode");
+                stopSimulatedTaps();
             }
         });
+
+        document.addEventListener("webkitfullscreenchange", () => {
+            const phoneScreen = document.getElementById("phoneScreen");
+            if (!document.webkitFullscreenElement) {
+                phoneScreen.classList.remove("fullscreen-mode");
+                stopSimulatedTaps();
+            }
+        });
+
         let callActive = false;
         let callTime = 0;
         let callInterval;
         let childName = "";
         let parentRole = "";
         const timeoutIds = []; // Array to store all setTimeout IDs
+
         // Fix for Ringing Sound
         const ringingSound = document.getElementById("ringingSound");
         const clickSound = document.getElementById("clickSound");
@@ -270,6 +286,7 @@
         clickSound.onerror = () => {
             console.error("Error loading click sound.");
         };
+
         // Update Current Time in Status Bar
         function updateCurrentTime() {
             const now = new Date();
@@ -279,9 +296,11 @@
             const formattedHours = (hours % 12 || 12).toString().padStart(2, "0"); // Convert to 12-hour format
             document.getElementById("currentTime").innerText = `${formattedHours}:${minutes} ${ampm}`;
         }
+
         // Start Updating Time Every Second
         setInterval(updateCurrentTime, 1000);
         updateCurrentTime(); // Initial call to set the time immediately
+
         function setParentRole(role) {
             parentRole = role;
             childName = document.getElementById("childName").value.trim();
@@ -295,6 +314,7 @@
                 alert("Please enter the child's name and select the parent role.");
             }
         }
+
         function startCall() {
             if (!childName || !parentRole) {
                 alert("Please enter the child's name and select the parent role.");
@@ -306,12 +326,14 @@
             document.getElementById("callTimer").innerText = "00:00";
             document.getElementById("callBtn").style.display = "none";
             document.getElementById("hangupBtn").style.display = "inline-block";
+
             // Play realistic ringing sound
             if (ringingSound.paused) {
                 ringingSound.play().catch((error) => {
                     console.error("Failed to play ringing sound:", error);
                 });
             }
+
             // Simulate call connection after 5 seconds
             setTimeout(() => {
                 ringingSound.pause(); // Stop ringing sound
@@ -323,6 +345,7 @@
                 startTimer();
             }, 5000); // 5 seconds of ringing
         }
+
         function endCall() {
             callActive = false;
             clearInterval(callInterval);
@@ -332,17 +355,21 @@
             document.getElementById("callScreen").style.display = "none";
             document.getElementById("callBtn").style.display = "inline-block";
             document.getElementById("hangupBtn").style.display = "none";
+
             // Stop Text-to-Speech immediately
             responsiveVoice.cancel();
+
             // Clear all pending timeouts
             timeoutIds.forEach((id) => clearTimeout(id));
             timeoutIds.length = 0; // Clear the array
+
             // Ensure ringing sound stops immediately
             if (!ringingSound.paused) {
                 ringingSound.pause();
                 ringingSound.currentTime = 0; // Reset audio to start
             }
         }
+
         function startTimer() {
             callInterval = setInterval(() => {
                 if (!callActive) return;
@@ -353,6 +380,7 @@
                     (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
             }, 1000);
         }
+
         function speak(text, delay = 0) {
             const timeoutId = setTimeout(() => {
                 responsiveVoice.speak(text, "UK English Male", {
@@ -363,11 +391,13 @@
             // Store the timeout ID to clear it later if needed
             timeoutIds.push(timeoutId);
         }
+
         function calculateDelay(text) {
             // Calculate delay based on the number of words in the text
             const wordCount = text.split(/\s+/).length;
             return wordCount * 500; // 500ms per word
         }
+
         function startDialogue() {
             const messages = [
                 { text: "9 1 1, what’s your emergency?", type: "open" },
@@ -406,13 +436,14 @@
             const phoneScreen = document.getElementById("phoneScreen");
             const tapEvent = new Event("touchstart", {
                 bubbles: true,
-                cancelable: true,
+                cancelable: false, // Make it non-cancelable for better performance
             });
             phoneScreen.dispatchEvent(tapEvent);
         }
 
         // Start Simulating Taps Every 10 Seconds
         let tapInterval;
+
         function startSimulatedTaps() {
             tapInterval = setInterval(simulateTap, 10000); // Simulate tap every 10 seconds
         }
@@ -422,35 +453,10 @@
             clearInterval(tapInterval);
         }
 
-        // Start Simulated Taps When Fullscreen is Activated
-        function requestFullScreen() {
-            const phoneScreen = document.getElementById("phoneScreen");
-            if (phoneScreen.requestFullscreen) {
-                phoneScreen.requestFullscreen();
-            } else if (phoneScreen.mozRequestFullScreen) { // Firefox
-                phoneScreen.mozRequestFullScreen();
-            } else if (phoneScreen.webkitRequestFullscreen) { // Chrome, Safari, and Opera
-                phoneScreen.webkitRequestFullscreen();
-            } else if (phoneScreen.msRequestFullscreen) { // IE/Edge
-                phoneScreen.msRequestFullscreen();
-            }
-            // Add 'fullscreen-mode' class to phone screen
-            phoneScreen.classList.add("fullscreen-mode");
-            // Hide browser UI (address bar, etc.)
-            setTimeout(() => {
-                window.scrollTo(0, 1); // Scroll slightly to hide address bar
-            }, 0);
-            // Start simulating taps
-            startSimulatedTaps();
-        }
-
-        // Stop Simulated Taps When Exiting Fullscreen
-        document.addEventListener("fullscreenchange", () => {
-            const phoneScreen = document.getElementById("phoneScreen");
-            if (!document.fullscreenElement) {
-                phoneScreen.classList.remove("fullscreen-mode");
-                stopSimulatedTaps();
-            }
+        // Preload audio when fullscreen button is clicked
+        document.querySelector('.fullscreen-button').addEventListener('click', () => {
+            ringingSound.load(); // Preload the ringing sound
+            clickSound.load();   // Preload the click sound
         });
     </script>
 </body>
