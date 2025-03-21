@@ -15,8 +15,8 @@
             font-family: Arial, sans-serif;
             color: white;
             overflow: hidden; /* Prevent scrolling */
-            margin: 0; /* Ensure no margin on body */
-            padding: 0; /* Ensure no padding on body */
+            margin: 0; /* Ensure no margin */
+            padding: 0; /* Ensure no padding */
         }
         /* Phone Screen Container */
         .phone-screen {
@@ -24,12 +24,20 @@
             max-width: 400px; /* Limit maximum width */
             height: 80vh; /* Responsive height */
             background-color: #000;
-            border-radius: 40px;
+            border-radius: 40px; /* Rounded corners for normal mode */
             overflow: hidden;
             position: relative;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
+        }
+        /* Fullscreen Mode Styles */
+        .phone-screen.fullscreen-mode {
+            width: 100vw; /* Full width */
+            height: 100vh; /* Full height */
+            border-radius: 0; /* Remove rounded corners */
+            margin: 0; /* Ensure no margin */
+            padding: 0; /* Ensure no padding */
         }
         /* Status Bar (Top Bar) */
         .status-bar {
@@ -173,30 +181,12 @@
         .call-buttons .hangup-button:hover {
             background-color: #cc0000;
         }
-        /* Fullscreen-Specific Styles */
-        .phone-screen:fullscreen {
-            width: 100vw;
-            height: 100vh;
-            border-radius: 0; /* Remove rounded corners */
-            overflow: hidden;
-            margin: 0; /* Ensure no margin */
-            padding: 0; /* Ensure no padding */
-        }
-        .phone-screen:fullscreen .status-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%; /* Span the full width */
-            padding: 5px 10px; /* Maintain padding for content */
-            box-sizing: border-box; /* Ensure padding doesn't affect layout */
-        }
     </style>
     <!-- Include ResponsiveVoice.js -->
     <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
 </head>
 <body>
-    <div class="phone-screen">
+    <div class="phone-screen" id="phoneScreen">
         <!-- Status Bar -->
         <div class="status-bar">
             <div class="time" id="currentTime">9:41 AM</div>
@@ -237,22 +227,34 @@
     <script>
         // Fullscreen API Implementation
         function requestFullScreen() {
-            const elem = document.documentElement; // Target the entire document
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-            } else if (elem.mozRequestFullScreen) { // Firefox
-                elem.mozRequestFullScreen();
-            } else if (elem.webkitRequestFullscreen) { // Chrome, Safari, and Opera
-                elem.webkitRequestFullscreen();
-            } else if (elem.msRequestFullscreen) { // IE/Edge
-                elem.msRequestFullscreen();
+            const phoneScreen = document.getElementById("phoneScreen");
+            if (phoneScreen.requestFullscreen) {
+                phoneScreen.requestFullscreen();
+            } else if (phoneScreen.mozRequestFullScreen) { // Firefox
+                phoneScreen.mozRequestFullScreen();
+            } else if (phoneScreen.webkitRequestFullscreen) { // Chrome, Safari, and Opera
+                phoneScreen.webkitRequestFullscreen();
+            } else if (phoneScreen.msRequestFullscreen) { // IE/Edge
+                phoneScreen.msRequestFullscreen();
             }
+
+            // Add 'fullscreen-mode' class to phone screen
+            phoneScreen.classList.add("fullscreen-mode");
 
             // Hide browser UI (address bar, etc.)
             setTimeout(() => {
                 window.scrollTo(0, 1); // Scroll slightly to hide address bar
             }, 0);
         }
+
+        // Exit Fullscreen
+        document.addEventListener("fullscreenchange", () => {
+            const phoneScreen = document.getElementById("phoneScreen");
+            if (!document.fullscreenElement) {
+                phoneScreen.classList.remove("fullscreen-mode");
+            }
+        });
+
         let callActive = false;
         let callTime = 0;
         let callInterval;
