@@ -224,6 +224,8 @@
     </div>
     <!-- Audio for Realistic Ringing Sound -->
     <audio id="ringingSound" src="https://www.soundjay.com/phone/phone-calling-1b.mp3" loop></audio>
+    <!-- Audio for Click Sound -->
+    <audio id="clickSound" src="https://www.soundjay.com/phone/phone-pick-up-3.mp3"></audio>
     <script>
         // Fullscreen API Implementation
         function requestFullScreen() {
@@ -237,16 +239,13 @@
             } else if (phoneScreen.msRequestFullscreen) { // IE/Edge
                 phoneScreen.msRequestFullscreen();
             }
-
             // Add 'fullscreen-mode' class to phone screen
             phoneScreen.classList.add("fullscreen-mode");
-
             // Hide browser UI (address bar, etc.)
             setTimeout(() => {
                 window.scrollTo(0, 1); // Scroll slightly to hide address bar
             }, 0);
         }
-
         // Exit Fullscreen
         document.addEventListener("fullscreenchange", () => {
             const phoneScreen = document.getElementById("phoneScreen");
@@ -254,7 +253,6 @@
                 phoneScreen.classList.remove("fullscreen-mode");
             }
         });
-
         let callActive = false;
         let callTime = 0;
         let callInterval;
@@ -263,9 +261,14 @@
         const timeoutIds = []; // Array to store all setTimeout IDs
         // Fix for Ringing Sound
         const ringingSound = document.getElementById("ringingSound");
+        const clickSound = document.getElementById("clickSound");
         ringingSound.volume = 0.5; // Adjust volume to 50%
+        clickSound.volume = 0.8; // Adjust click sound volume
         ringingSound.onerror = () => {
             console.error("Error loading ringing sound.");
+        };
+        clickSound.onerror = () => {
+            console.error("Error loading click sound.");
         };
         // Update Current Time in Status Bar
         function updateCurrentTime() {
@@ -312,6 +315,9 @@
             // Simulate call connection after 5 seconds
             setTimeout(() => {
                 ringingSound.pause(); // Stop ringing sound
+                clickSound.play().catch((error) => {
+                    console.error("Failed to play click sound:", error);
+                }); // Play click sound
                 document.getElementById("callStatus").innerText = "Connected";
                 startDialogue();
                 startTimer();
