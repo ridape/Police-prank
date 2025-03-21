@@ -112,20 +112,9 @@
             cursor: pointer;
             background-color: #ff4444;
             color: white;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         .fullscreen-button:hover {
             background-color: #cc0000;
-        }
-        /* Tooltip for Mobile */
-        .fullscreen-info {
-            font-size: 2.5vw;
-            color: #ccc;
-            margin-top: 5px;
-            text-align: center;
         }
         /* Call Screen */
         .call-screen {
@@ -214,9 +203,7 @@
                 <button onclick="setParentRole('father')">Father</button>
             </div>
             <!-- Fullscreen Button -->
-            <button class="fullscreen-button" onclick="requestFullScreen()">Go Fullscreen</button>
-            <!-- Info Text -->
-            <div class="fullscreen-info">Works for Chrome and most browsers</div>
+            <button class="fullscreen-button" onclick="requestFullScreen()">Go Fullscreen in Chrome</button>
         </div>
         <!-- Call Screen -->
         <div class="call-screen" id="callScreen">
@@ -383,7 +370,7 @@
         }
         function startDialogue() {
             const messages = [
-                { text: "9 1 1, what’s your emergency?", type: "open" },
+                { text: "911, what’s your emergency?", type: "open" },
                 { text: "What's the name and age of the child?", type: "open" },
                 { text: `Are you the ${parentRole} of ${childName}?`, type: "yesno" },
                 { text: `Please give the phone to ${childName}.`, type: "statement" },
@@ -412,6 +399,7 @@
                 }
             });
         }
+
         // Simulate Screen Tap to Keep Screen On
         function simulateTap() {
             const phoneScreen = document.getElementById("phoneScreen");
@@ -421,15 +409,18 @@
             });
             phoneScreen.dispatchEvent(tapEvent);
         }
+
         // Start Simulating Taps Every 10 Seconds
         let tapInterval;
         function startSimulatedTaps() {
             tapInterval = setInterval(simulateTap, 10000); // Simulate tap every 10 seconds
         }
+
         // Stop Simulating Taps
         function stopSimulatedTaps() {
             clearInterval(tapInterval);
         }
+
         // Start Simulated Taps When Fullscreen is Activated
         function requestFullScreen() {
             const phoneScreen = document.getElementById("phoneScreen");
@@ -451,6 +442,7 @@
             // Start simulating taps
             startSimulatedTaps();
         }
+
         // Stop Simulated Taps When Exiting Fullscreen
         document.addEventListener("fullscreenchange", () => {
             const phoneScreen = document.getElementById("phoneScreen");
