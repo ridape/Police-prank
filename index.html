@@ -11,63 +11,53 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-        }
-        /* Intro Page */
-        .intro-page {
-            text-align: center;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        .intro-page h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
-        .intro-page input {
-            padding: 10px;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            width: 80%;
-        }
-        .intro-page button {
-            padding: 10px 20px;
-            font-size: 1rem;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-        }
-        .intro-page button:hover {
-            background-color: #0056b3;
-        }
-        /* Phone Screen Container */
-        .phone-screen {
-            display: none; /* Hidden by default */
-            width: 90%;
-            max-width: 400px;
-            height: 80vh;
             background-color: #000;
-            border-radius: 40px;
+            font-family: Arial, sans-serif;
+            color: white;
             overflow: hidden;
-            position: relative;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+        /* Intro Screen */
+        .intro-screen {
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            text-align: center;
         }
-        /* Fullscreen Mode Styles */
-        .phone-screen.fullscreen-mode {
+        .intro-screen input {
+            padding: 10px;
+            font-size: 4vw;
+            border-radius: 5px;
+            border: none;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            width: 80%;
+        }
+        .intro-screen input::placeholder {
+            color: #aaa;
+        }
+        .intro-screen button {
+            padding: 10px 20px;
+            font-size: 4vw;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background-color: #ff4444;
+            color: white;
+        }
+        .intro-screen button:hover {
+            background-color: #cc0000;
+        }
+        /* Phone Screen Container (Hidden Initially) */
+        .phone-screen {
             width: 100vw;
             height: 100vh;
-            border-radius: 0;
-            margin: 0;
-            padding: 0;
+            background-color: #000;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            position: relative;
         }
         /* Status Bar (Top Bar) */
         .status-bar {
@@ -159,17 +149,16 @@
             background-color: #cc0000;
         }
     </style>
+    <!-- Include ResponsiveVoice.js -->
     <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
 </head>
 <body>
-    <!-- Intro Page -->
-    <div class="intro-page">
-        <h1>Prank Call - Police</h1>
+    <!-- Intro Screen -->
+    <div class="intro-screen" id="introScreen">
         <input type="text" id="childName" placeholder="Enter child's name">
-        <button onclick="startFullscreen()">Enter</button>
+        <button onclick="startFullScreen()">Enter</button>
     </div>
-
-    <!-- Phone Screen -->
+    <!-- Phone Screen (Hidden Initially) -->
     <div class="phone-screen" id="phoneScreen">
         <!-- Status Bar -->
         <div class="status-bar">
@@ -181,84 +170,45 @@
         </div>
         <!-- Call Screen -->
         <div class="call-screen" id="callScreen">
+            <!-- Contact Photo -->
             <div class="contact-photo">👮‍♂️</div>
+            <!-- Contact Name -->
             <div class="contact-name">Police Department</div>
+            <!-- Call Status -->
             <div class="call-status" id="callStatus">Ready to call</div>
+            <!-- Call Timer -->
             <div class="call-timer" id="callTimer">00:00</div>
+            <!-- Call Buttons -->
             <div class="call-buttons">
                 <button onclick="startCall()" id="callBtn">📞</button>
                 <button class="hangup-button" onclick="endCall()" id="hangupBtn" style="display: none;">🔴</button>
             </div>
         </div>
     </div>
-
     <!-- Audio for Realistic Ringing Sound -->
     <audio id="ringingSound" src="https://www.soundjay.com/phone/phone-calling-1b.mp3" loop></audio>
+    <!-- Audio for Click Sound -->
     <audio id="clickSound" src="https://www.soundjay.com/phone/phone-pick-up-3.mp3"></audio>
-
     <script>
-        // Fullscreen API Implementation
-        function startFullscreen() {
-            const childName = document.getElementById("childName").value.trim();
-            if (!childName) {
-                alert("Please enter the child's name.");
-                return;
-            }
-
-            const phoneScreen = document.getElementById("phoneScreen");
-            if (phoneScreen.requestFullscreen) {
-                phoneScreen.requestFullscreen();
-            } else if (phoneScreen.mozRequestFullScreen) {
-                phoneScreen.mozRequestFullScreen();
-            } else if (phoneScreen.webkitRequestFullscreen) {
-                phoneScreen.webkitRequestFullscreen();
-            } else if (phoneScreen.msRequestFullscreen) {
-                phoneScreen.msRequestFullscreen();
-            }
-
-            // Add 'fullscreen-mode' class to phone screen
-            phoneScreen.classList.add("fullscreen-mode");
-
-            // Show phone screen and hide intro page
-            document.querySelector(".intro-page").style.display = "none";
-            phoneScreen.style.display = "flex";
-
-            // Start updating time and simulate taps
-            updateCurrentTime();
-            setInterval(updateCurrentTime, 1000);
-            startSimulatedTaps();
-        }
-
-        // Exit Fullscreen
-        document.addEventListener("fullscreenchange", () => {
-            const phoneScreen = document.getElementById("phoneScreen");
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                phoneScreen.classList.remove("fullscreen-mode");
-                stopSimulatedTaps();
-            }
-        });
-
-        document.addEventListener("webkitfullscreenchange", () => {
-            const phoneScreen = document.getElementById("phoneScreen");
-            if (!document.webkitFullscreenElement) {
-                phoneScreen.classList.remove("fullscreen-mode");
-                stopSimulatedTaps();
-            }
-        });
-
-        // Variables
         let callActive = false;
         let callTime = 0;
         let callInterval;
         let childName = "";
+        const timeoutIds = []; // Array to store all setTimeout IDs
 
-        // Audio Fix
+        // Fix for Ringing Sound
         const ringingSound = document.getElementById("ringingSound");
         const clickSound = document.getElementById("clickSound");
-        ringingSound.volume = 0.5;
-        clickSound.volume = 0.8;
+        ringingSound.volume = 0.5; // Adjust volume to 50%
+        clickSound.volume = 0.8; // Adjust click sound volume
+        ringingSound.onerror = () => {
+            console.error("Error loading ringing sound.");
+        };
+        clickSound.onerror = () => {
+            console.error("Error loading click sound.");
+        };
 
-        // Update Current Time
+        // Update Current Time in Status Bar
         function updateCurrentTime() {
             const now = new Date();
             const hours = now.getHours().toString().padStart(2, "0");
@@ -268,14 +218,58 @@
             document.getElementById("currentTime").innerText = `${formattedHours}:${minutes} ${ampm}`;
         }
 
-        // Call Functions
-        function startCall() {
+        // Start Updating Time Every Second
+        setInterval(updateCurrentTime, 1000);
+        updateCurrentTime(); // Initial call to set the time immediately
+
+        // Start Fullscreen and Load Phone Screen
+        function startFullScreen() {
             childName = document.getElementById("childName").value.trim();
             if (!childName) {
                 alert("Please enter the child's name.");
                 return;
             }
+            // Hide intro screen and show phone screen
+            document.getElementById("introScreen").style.display = "none";
+            document.getElementById("phoneScreen").style.display = "flex";
+            // Enter fullscreen mode
+            requestFullScreen();
+        }
 
+        // Fullscreen API Implementation (Safari Compatible)
+        function requestFullScreen() {
+            const phoneScreen = document.getElementById("phoneScreen");
+            if (phoneScreen.requestFullscreen) {
+                phoneScreen.requestFullscreen();
+            } else if (phoneScreen.mozRequestFullScreen) { // Firefox
+                phoneScreen.mozRequestFullScreen();
+            } else if (phoneScreen.webkitRequestFullscreen) { // Chrome, Safari, and Opera
+                phoneScreen.webkitRequestFullscreen();
+            } else if (phoneScreen.msRequestFullscreen) { // IE/Edge
+                phoneScreen.msRequestFullscreen();
+            }
+            // Start simulating taps
+            startSimulatedTaps();
+        }
+
+        // Exit Fullscreen (Safari Compatible)
+        document.addEventListener("fullscreenchange", () => {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                stopSimulatedTaps();
+            }
+        });
+
+        document.addEventListener("webkitfullscreenchange", () => {
+            if (!document.webkitFullscreenElement) {
+                stopSimulatedTaps();
+            }
+        });
+
+        function startCall() {
+            if (!childName) {
+                alert("Please enter the child's name.");
+                return;
+            }
             callActive = true;
             callTime = 0;
             document.getElementById("callStatus").innerText = "Calling Police...";
@@ -283,7 +277,7 @@
             document.getElementById("callBtn").style.display = "none";
             document.getElementById("hangupBtn").style.display = "inline-block";
 
-            // Play ringing sound
+            // Play realistic ringing sound
             if (ringingSound.paused) {
                 ringingSound.play().catch((error) => {
                     console.error("Failed to play ringing sound:", error);
@@ -292,14 +286,14 @@
 
             // Simulate call connection after 5 seconds
             setTimeout(() => {
-                ringingSound.pause();
+                ringingSound.pause(); // Stop ringing sound
                 clickSound.play().catch((error) => {
                     console.error("Failed to play click sound:", error);
-                });
+                }); // Play click sound
                 document.getElementById("callStatus").innerText = "Connected";
                 startDialogue();
                 startTimer();
-            }, 5000);
+            }, 5000); // 5 seconds of ringing
         }
 
         function endCall() {
@@ -309,9 +303,19 @@
             document.getElementById("callTimer").innerText = "";
             document.getElementById("callBtn").style.display = "inline-block";
             document.getElementById("hangupBtn").style.display = "none";
+
+            // Stop Text-to-Speech immediately
             responsiveVoice.cancel();
-            ringingSound.pause();
-            ringingSound.currentTime = 0;
+
+            // Clear all pending timeouts
+            timeoutIds.forEach((id) => clearTimeout(id));
+            timeoutIds.length = 0; // Clear the array
+
+            // Ensure ringing sound stops immediately
+            if (!ringingSound.paused) {
+                ringingSound.pause();
+                ringingSound.currentTime = 0; // Reset audio to start
+            }
         }
 
         function startTimer() {
@@ -326,24 +330,26 @@
         }
 
         function speak(text, delay = 0) {
-            setTimeout(() => {
+            const timeoutId = setTimeout(() => {
                 responsiveVoice.speak(text, "UK English Male", {
                     pitch: 0.8,
                     rate: 0.9,
                 });
             }, delay);
+            // Store the timeout ID to clear it later if needed
+            timeoutIds.push(timeoutId);
         }
 
         function calculateDelay(text) {
+            // Calculate delay based on the number of words in the text
             const wordCount = text.split(/\s+/).length;
-            return wordCount * 500;
+            return wordCount * 500; // 500ms per word
         }
 
         function startDialogue() {
             const messages = [
                 { text: "9 1 1, what’s your emergency?", type: "open" },
                 { text: "What's the name and age of the child?", type: "open" },
-                { text: `Please give the phone to ${childName}.`, type: "statement" },
                 { text: `Hello, is this ${childName}?`, type: "yesno" },
                 { text: "This is the police. We heard you’re causing some problems. Is that true?", type: "yesno" },
                 { text: "Listen, this is serious. You need to stop what you’re doing right now.", type: "statement" },
@@ -351,27 +357,27 @@
                 { text: "If you say you’re sorry, I can call off the officer. Go ahead, say you're sorry.", type: "open" },
                 { text: "Okay, since you apologized, I’ll tell the officer to turn around.", type: "statement" },
                 { text: "If we get another call, we’re coming straight to your house. Do you understand?", type: "yesno" },
-                { text: "Okay, goodbye.", type: "statement" }
+                { text: "ok, Goodbye.", type: "statement" }
             ];
-
-            let cumulativeDelay = 1000;
+            let cumulativeDelay = 1000; // Initial delay
             messages.forEach((message, index) => {
-                const messageDuration = calculateDelay(message.text);
+                const messageDuration = calculateDelay(message.text); // Estimate duration of TTS
                 speak(message.text, cumulativeDelay);
-
                 if (index === 0) {
+                    // Add an extra delay of 4 seconds (4000ms) after the first message
                     cumulativeDelay += messageDuration + 4000;
                 } else if (message.type === "open") {
-                    cumulativeDelay += messageDuration + 3000;
+                    cumulativeDelay += messageDuration + 3000; // Add estimated duration + 3-second pause for open-ended questions
                 } else if (message.type === "yesno") {
-                    cumulativeDelay += messageDuration + 2000;
+                    cumulativeDelay += messageDuration + 2000; // Add estimated duration + 2-second pause for yes/no questions
                 } else {
+                    // No additional delay for statements
                     cumulativeDelay += messageDuration;
                 }
             });
         }
 
-        // Simulate Screen Tap
+        // Simulate Screen Tap to Keep Screen On
         function simulateTap() {
             const phoneScreen = document.getElementById("phoneScreen");
             const tapEvent = new Event("touchstart", {
@@ -381,14 +387,23 @@
             phoneScreen.dispatchEvent(tapEvent);
         }
 
+        // Start Simulating Taps Every 10 Seconds
         let tapInterval;
+
         function startSimulatedTaps() {
-            tapInterval = setInterval(simulateTap, 10000);
+            tapInterval = setInterval(simulateTap, 10000); // Simulate tap every 10 seconds
         }
 
+        // Stop Simulating Taps
         function stopSimulatedTaps() {
             clearInterval(tapInterval);
         }
+
+        // Preload audio when fullscreen button is clicked
+        document.querySelector('.intro-screen button').addEventListener('click', () => {
+            ringingSound.load(); // Preload the ringing sound
+            clickSound.load();   // Preload the click sound
+        });
     </script>
 </body>
 </html>
